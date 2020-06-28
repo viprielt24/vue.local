@@ -1,19 +1,24 @@
 <template>
-        <div>
-                <h2>Todo application</h2>
-                <router-link to="/">Home</router-link>
-                <AddTodo
-                        @add-todo="addTodo"
-                />
-                <hr>
-                <Loader v-if="loading" />
-                <TodoList
-                        v-else-if="todos.length"
-                        v-bind:todos="todos"
-                        @remove-todo="removeTodo"
-                />
-                <p v-else>No todos</p>
-        </div>
+    <div>
+        <h2>Todo application</h2>
+        <router-link to="/">Home</router-link>
+        <AddTodo
+                @add-todo="addTodo"
+        />
+            <select v-model="filter">
+                    <option value="all">All</option>
+                    <option value="completed">Completed</option>
+                    <option value="not-completed">Not Completed</option>
+            </select>
+        <hr>
+        <Loader v-if="loading" />
+        <TodoList
+            v-else-if="filteredTodos.length"
+            v-bind:todos="filteredTodos"
+            @remove-todo="removeTodo"
+        />
+        <p v-else>No todos</p>
+    </div>
 </template>
 
 <script>
@@ -30,7 +35,8 @@
                     // {id: 2, title: 'Купить масло', completed: false},
                     // {id: 3, title: 'Купить пиво', completed: false}
                 ],
-                loading: true
+                loading: true,
+                filter: 'all'
             }
         },
         mounted() {
@@ -42,6 +48,26 @@
                                 this.loading = false
                         },1000)
                 })
+        },
+        // watch: {
+        //     filter(value) {
+        //           console.log(value)
+        //     }
+        // },
+        computed: {
+            filteredTodos() {
+                if(this.filter === 'all') {
+                    return this.todos
+                }
+
+                if(this.filter === 'completed') {
+                    return this.todos.filter( t => t.completed)
+                }
+
+                if(this.filter === 'not-completed') {
+                    return this.todos.filter( t => !t.completed)
+                }
+            }
         },
         methods: {
             removeTodo(id){
